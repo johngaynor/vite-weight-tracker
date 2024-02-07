@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { useDarkMode, useChangeMode } from "../../store/AppStore";
 import { SunIcon, MoonIcon } from "@radix-ui/react-icons";
-import Auth from "../Auth/Auth";
+// import Auth from "../Auth/Auth";
 import "./Navbar.css";
 
 interface ListItemProps {
