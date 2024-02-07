@@ -103,7 +103,10 @@ const Navbar = () => {
       </NavigationMenu.List>
 
       <div className="ViewportPosition">
-        <NavigationMenu.Viewport className="NavigationMenuViewport" />
+        <NavigationMenu.Viewport
+          className="NavigationMenuViewport"
+          style={{ backgroundColor: darkMode ? "#111110" : "white" }}
+        />
       </div>
     </NavigationMenu.Root>
   );

@@ -135,12 +135,9 @@ p {
   margin: 0;
   column-gap: 10px;
   list-style: none;
+  opacity: 1;
 }
 @media only screen and (min-width: 600px) {
-  .List.one {
-    width: 500px;
-    grid-template-columns: 0.75fr 1fr;
-  }
   .List.two {
     width: 600px;
     grid-auto-flow: column;
@@ -222,7 +219,7 @@ p {
 
 .CaretDown {
   position: relative;
-  /* color: var(--iris-10); */
+  color: var(--iris-10);
   top: 1px;
   transition: transform 250ms ease;
 }
