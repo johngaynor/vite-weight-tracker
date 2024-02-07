@@ -32,7 +32,7 @@ function App() {
           direction="column"
           align="center"
           justify="center"
-          style={{ height: "98vh" }}
+          style={{ height: "97vh" }}
         >
           <Flex direction="column" align="center" justify="center" gap="3">
             <Box>
