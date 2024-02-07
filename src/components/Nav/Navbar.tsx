@@ -1,10 +1,10 @@
 import { forwardRef, ReactNode, Ref } from "react";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
-import classNames from "classnames";
+import { SunIcon, MoonIcon, HomeIcon } from "@radix-ui/react-icons";
 import { CaretDownIcon } from "@radix-ui/react-icons";
+import classNames from "classnames";
+
 import { useDarkMode, useChangeMode } from "../../store/AppStore";
-import { SunIcon, MoonIcon } from "@radix-ui/react-icons";
-// import Auth from "../Auth/Auth";
 import "./Navbar.css";
 
 interface ListItemProps {
@@ -41,7 +41,13 @@ const Navbar = () => {
     <>
       <NavigationMenu.Root className="NavigationMenuRoot">
         <NavigationMenu.List className="NavigationMenuList">
-          {/* overview section */}
+          {/* home button */}
+          <NavigationMenu.Item>
+            <NavigationMenu.Link className="NavigationMenuLink" href="/">
+              <HomeIcon />
+            </NavigationMenu.Link>
+          </NavigationMenu.Item>
+          {/* tech stack dropdown */}
           <NavigationMenu.Item>
             <NavigationMenu.Trigger className="NavigationMenuTrigger">
               Stack <CaretDownIcon className="CaretDown" aria-hidden />
@@ -89,6 +95,13 @@ const Navbar = () => {
               Github
             </NavigationMenu.Link>
           </NavigationMenu.Item>
+          {/* Login */}
+          <NavigationMenu.Item>
+            <NavigationMenu.Link className="NavigationMenuLink" href="/auth">
+              Login
+            </NavigationMenu.Link>
+          </NavigationMenu.Item>
+          {/* change light mode */}
           <NavigationMenu.Item onClick={() => changeMode()}>
             <NavigationMenu.Link className="NavigationMenuLink">
               {darkMode ? <MoonIcon /> : <SunIcon />}
@@ -99,7 +112,6 @@ const Navbar = () => {
             <div className="Arrow" />
           </NavigationMenu.Indicator>
         </NavigationMenu.List>
-
         <div className="ViewportPosition">
           <NavigationMenu.Viewport
             className="NavigationMenuViewport"
@@ -107,8 +119,6 @@ const Navbar = () => {
           />
         </div>
       </NavigationMenu.Root>
-
-      {/* <Auth /> */}
     </>
   );
 };
