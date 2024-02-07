@@ -27,6 +27,7 @@ const Navbar = () => {
             className={classNames("ListItemLink", className)}
             {...props}
             ref={forwardedRef}
+            target="_blank"
           >
             <div className="ListItemHeading">{title}</div>
             <p className="ListItemText">{children}</p>
@@ -41,43 +42,36 @@ const Navbar = () => {
         {/* overview section */}
         <NavigationMenu.Item>
           <NavigationMenu.Trigger className="NavigationMenuTrigger">
-            Overview <CaretDownIcon className="CaretDown" aria-hidden />
+            Stack <CaretDownIcon className="CaretDown" aria-hidden />
           </NavigationMenu.Trigger>
           <NavigationMenu.Content className="NavigationMenuContent">
             <ul className="List two">
-              <ListItem
-                title="Introduction"
-                href="/primitives/docs/overview/introduction"
-              >
-                Build high-quality, accessible design systems and web apps.
+              <ListItem title="React + Vite" href="https://vitejs.dev/guide/">
+                React app initialized and developed with Vite.
               </ListItem>
               <ListItem
-                title="Getting started"
-                href="/primitives/docs/overview/getting-started"
+                title="Zustand"
+                href="https://docs.pmnd.rs/zustand/getting-started/introduction"
               >
-                A quick tutorial to get you up and running with Radix
-                Primitives.
-              </ListItem>
-              <ListItem title="Styling" href="/primitives/docs/guides/styling">
-                Unstyled and compatible with any styling solution.
+                Minimal, unopinonated state management library.
               </ListItem>
               <ListItem
-                title="Animation"
-                href="/primitives/docs/guides/animation"
+                title="TypeScript"
+                href="https://www.typescriptlang.org/docs/"
               >
-                Use CSS keyframes or any animation library of your choice.
+                Experimentation with interfaces and type safety.
+              </ListItem>
+              <ListItem title="Radix UI" href="https://www.radix-ui.com">
+                Minimalistic design system with components and themes.
+              </ListItem>
+              <ListItem title="Supabase" href="https://supabase.com/docs">
+                Open source platform with services for data and authentication.
               </ListItem>
               <ListItem
-                title="Accessibility"
-                href="/primitives/docs/overview/accessibility"
+                title="React Query"
+                href="https://tanstack.com/query/latest"
               >
-                Tested in a range of browsers and assistive technologies.
-              </ListItem>
-              <ListItem
-                title="Releases"
-                href="/primitives/docs/overview/releases"
-              >
-                Radix Primitives releases and their changelogs.
+                Async state management, complete with loading and error states.
               </ListItem>
             </ul>
           </NavigationMenu.Content>
