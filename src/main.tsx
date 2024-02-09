@@ -5,6 +5,8 @@ import Root from "./routes/root.tsx";
 import Auth from "./routes/Auth/Auth.tsx";
 import ErrorPage from "./components/error-page.tsx";
 import "@radix-ui/themes/styles.css";
+import "react-toastify/dist/ReactToastify.css";
+
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 const router = createBrowserRouter([

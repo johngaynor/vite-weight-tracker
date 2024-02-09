@@ -3,9 +3,16 @@ import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { SunIcon, MoonIcon, HomeIcon } from "@radix-ui/react-icons";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import classNames from "classnames";
+import supabase from "../../config/SupabaseConfig";
 
-import { useDarkMode, useChangeMode } from "../../store/AppStore";
+import {
+  useDarkMode,
+  useChangeMode,
+  useUser,
+  useSetUser,
+} from "../../store/AppStore";
 import "./Navbar.css";
+import { toast } from "react-toastify";
 
 interface ListItemProps {
   className?: string;
@@ -17,6 +24,8 @@ interface ListItemProps {
 const Navbar = () => {
   const darkMode = useDarkMode();
   const changeMode = useChangeMode();
+  const user = useUser();
+  const setUser = useSetUser();
   const ListItem = forwardRef(
     (
       { className, children, title, ...props }: ListItemProps,
@@ -37,6 +46,17 @@ const Navbar = () => {
       </li>
     )
   );
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error("Error signing out: " + error.message);
+    } else {
+      toast.success("You have successfully logged out. See you later :)");
+      setUser(null);
+    }
+  };
+
   return (
     <>
       <NavigationMenu.Root className="NavigationMenuRoot">
@@ -95,12 +115,24 @@ const Navbar = () => {
               Github
             </NavigationMenu.Link>
           </NavigationMenu.Item>
-          {/* Login */}
-          <NavigationMenu.Item>
-            <NavigationMenu.Link className="NavigationMenuLink" href="/auth">
-              Login
-            </NavigationMenu.Link>
-          </NavigationMenu.Item>
+          {/* Auth */}
+          {user ? (
+            <NavigationMenu.Item>
+              <NavigationMenu.Link
+                className="NavigationMenuLink"
+                onClick={handleLogout}
+              >
+                Logout
+              </NavigationMenu.Link>
+            </NavigationMenu.Item>
+          ) : (
+            <NavigationMenu.Item>
+              <NavigationMenu.Link className="NavigationMenuLink" href="/auth">
+                Login
+              </NavigationMenu.Link>
+            </NavigationMenu.Item>
+          )}
+
           {/* change light mode */}
           <NavigationMenu.Item onClick={() => changeMode()}>
             <NavigationMenu.Link className="NavigationMenuLink">

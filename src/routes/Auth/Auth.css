@@ -25,7 +25,6 @@ input {
 
 .TabsTrigger {
   font-family: inherit;
-  /* background-color: white; */
   padding: 0 20px;
   height: 45px;
   flex: 1;
@@ -44,27 +43,26 @@ input {
   border-top-right-radius: 6px;
 }
 .TabsTrigger:hover {
-  color: var(--violet-11);
+  color: var(--iris-11);
 }
 .TabsTrigger[data-state="active"] {
-  color: var(--violet-11);
+  color: var(--iris-11);
   box-shadow: inset 0 -1px 0 0 currentColor, 0 1px 0 0 currentColor;
 }
 .TabsTrigger:focus {
   position: relative;
-  box-shadow: 0 0 0 2px black;
+  box-shadow: 0 0 0 2px var(--iris-11);
 }
 
 .TabsContent {
   flex-grow: 1;
   padding: 20px;
-  /* background-color: white; */
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
   outline: none;
 }
 .TabsContent:focus {
-  box-shadow: 0 0 0 2px black;
+  box-shadow: 0 0 0 2px var(--iris-11);
 }
 
 .Text {
@@ -76,7 +74,7 @@ input {
 }
 
 .Fieldset {
-  margin-bottom: 15px;
+  margin: 15px 0;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -87,7 +85,7 @@ input {
   font-size: 13px;
   line-height: 1;
   margin-bottom: 10px;
-  color: var(--violet-12);
+  color: var(--iris-12);
   display: block;
 }
 
@@ -97,12 +95,12 @@ input {
   padding: 0 10px;
   font-size: 15px;
   line-height: 1;
-  color: var(--violet-11);
-  box-shadow: 0 0 0 1px var(--violet-7);
+  color: var(--iris-11);
+  box-shadow: 0 0 0 1px var(--iris-7);
   height: 35px;
 }
 .Input:focus {
-  box-shadow: 0 0 0 2px var(--violet-8);
+  box-shadow: 0 0 0 2px var(--iris-8);
 }
 
 .Button {
