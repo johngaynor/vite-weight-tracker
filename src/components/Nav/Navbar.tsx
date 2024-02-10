@@ -1,4 +1,5 @@
 import { forwardRef, ReactNode, Ref } from "react";
+import { useNavigate } from "react-router-dom";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { SunIcon, MoonIcon, HomeIcon } from "@radix-ui/react-icons";
 import { CaretDownIcon } from "@radix-ui/react-icons";
@@ -26,6 +27,7 @@ const Navbar = () => {
   const changeMode = useChangeMode();
   const user = useUser();
   const setUser = useSetUser();
+  const navigate = useNavigate();
   const ListItem = forwardRef(
     (
       { className, children, title, ...props }: ListItemProps,
@@ -54,6 +56,7 @@ const Navbar = () => {
     } else {
       toast.success("You have successfully logged out. See you later :)");
       setUser(null);
+      navigate("/");
     }
   };
 

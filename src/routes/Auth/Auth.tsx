@@ -2,6 +2,7 @@ import React, { useCallback, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { toast } from "react-toastify";
 import supabase from "../../config/SupabaseConfig";
+import { useNavigate } from "react-router-dom";
 import "./Auth.css";
 
 type FormFields = {
@@ -20,6 +21,7 @@ const Auth = () => {
     registerPassword: "",
     registerConfirmPassword: "",
   });
+  const navigate = useNavigate();
 
   const handleLogin = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -43,6 +45,7 @@ const Auth = () => {
           loginEmail: "",
           loginPassword: "",
         }));
+        navigate("/");
       }
     },
     [formFields]
@@ -81,6 +84,7 @@ const Auth = () => {
           registerPassword: "",
           registerConfirmPassword: "",
         }));
+        navigate("/");
       }
     },
     [formFields]
@@ -121,6 +125,7 @@ const Auth = () => {
           <input
             className="Input"
             id="login-password"
+            type="password"
             placeholder="123456"
             value={formFields.loginPassword}
             onChange={(e) =>
