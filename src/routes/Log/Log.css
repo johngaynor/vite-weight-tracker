@@ -109,7 +109,6 @@ textarea {
 }
 
 .Textarea {
-  /* border: 2px solid red; */
   height: 150px;
   padding: 10px;
 }
@@ -134,4 +133,16 @@ textarea {
 }
 .Button.green:focus {
   box-shadow: 0 0 0 2px var(--green-7);
+}
+
+.TabsRoot .DateSelector {
+  box-shadow: 0 0 0 1px var(--iris-7);
+  border-radius: 5px;
+  width: 50%;
+  margin: 20px auto;
+  padding: 5px;
+}
+
+.DatePicker {
+  margin-left: 10px;
 }
