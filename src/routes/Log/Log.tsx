@@ -1,9 +1,9 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import DatePicker from "react-datepicker";
-import { useDarkMode } from "../../store/AppStore";
-// import { toast } from "react-toastify";
-// import supabase from "../../config/SupabaseConfig";
+import { useDarkMode, useUser } from "../../store/AppStore";
+import { toast } from "react-toastify";
+import supabase from "../../config/SupabaseConfig";
 import { useNavigate } from "react-router-dom";
 import "./Log.css";
 import "react-datepicker/dist/react-datepicker.css";
@@ -27,6 +27,7 @@ const Log = () => {
   const [date, setDate] = useState(new Date());
   const darkMode = useDarkMode();
   const navigate = useNavigate();
+  const user = useUser();
 
   const handleSaveMorning = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -63,6 +64,31 @@ const Log = () => {
       }));
     }
   };
+
+  const getLog = async () => {
+    console.log("user.id", user.id); // showing correct id
+
+    const {
+      data: { user: supabaseUser },
+    } = await supabase.auth.getUser();
+
+    console.log("supabase user.id", supabaseUser?.id);
+    const { data, error } = await supabase
+      .from("user_log")
+      .select()
+      .eq("id", user.id);
+    if (error) {
+      toast.error("Error retrieving log: " + error.message);
+    } else {
+      console.log(data);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      getLog();
+    }
+  }, [user]);
 
   return (
     <>

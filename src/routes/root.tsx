@@ -11,15 +11,19 @@ const Root = () => {
   const user = useUser();
   const setUser = useSetUser();
   const { data } = supabase.auth.onAuthStateChange((event, session) => {
-    console.log("ROOT", event, session);
+    // console.log("ROOT", event, session);
 
     if (event === "INITIAL_SESSION") {
       // handle initial session
     } else if (event === "SIGNED_IN") {
-      if (!user && session?.user) {
+      // if (!user && session?.user) {
+      //   setUser(session.user);
+      // }
+      // handle sign in event
+      // console.log("user", session?.user);
+      if (session?.user) {
         setUser(session.user);
       }
-      // handle sign in event
     } else if (event === "SIGNED_OUT") {
       // handle sign out event
     } else if (event === "PASSWORD_RECOVERY") {
