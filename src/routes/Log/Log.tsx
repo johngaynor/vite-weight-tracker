@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import DatePicker from "react-datepicker";
 import { useDarkMode, useUser } from "../../store/AppStore";
+import { useLog, useSetLog } from "../../store/LogStore";
 import { toast } from "react-toastify";
 import supabase from "../../config/SupabaseConfig";
 import { useNavigate } from "react-router-dom";
@@ -13,21 +14,25 @@ type FormFields = {
   morningNotes: string;
   nightWeight: number | null;
   nightNotes: string;
-  // nightCalories: number;
+};
+
+const defaultFormFields = {
+  morningWeight: null,
+  morningNotes: "",
+  nightWeight: null,
+  nightNotes: "",
 };
 
 const Log = () => {
   const [formFields, setFormFields] = useState<FormFields>({
-    morningWeight: null,
-    morningNotes: "",
-    nightWeight: null,
-    nightNotes: "",
-    // nightCalories: 0,
+    ...defaultFormFields,
   });
   const [date, setDate] = useState(new Date());
   const darkMode = useDarkMode();
   const navigate = useNavigate();
   const user = useUser();
+  const log = useLog();
+  const setLog = useSetLog();
 
   const handleSaveMorning = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -66,13 +71,6 @@ const Log = () => {
   };
 
   const getLog = async () => {
-    console.log("user.id", user.id); // showing correct id
-
-    const {
-      data: { user: supabaseUser },
-    } = await supabase.auth.getUser();
-
-    console.log("supabase user.id", supabaseUser?.id);
     const { data, error } = await supabase
       .from("user_log")
       .select()
@@ -80,8 +78,22 @@ const Log = () => {
     if (error) {
       toast.error("Error retrieving log: " + error.message);
     } else {
-      console.log(data);
+      toast.success("Succesfully retrieved logs!");
+      setLog(data);
     }
+  };
+
+  const formatDate = () => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const formattedDate =
+      year +
+      "-" +
+      (month < 10 ? "0" + month : month) +
+      "-" +
+      (day < 10 ? "0" + day : day);
+    return formattedDate;
   };
 
   useEffect(() => {
@@ -89,6 +101,24 @@ const Log = () => {
       getLog();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (log) {
+      const formattedDate = formatDate();
+      const match = log.find((l) => l.day === formattedDate);
+      if (match) {
+        setFormFields((prev) => ({
+          ...prev,
+          morningWeight: match.morning_weight,
+          nightWeight: match.night_weight,
+          morningNotes: match.morning_notes || "",
+          nightNotes: match.night_notes || "",
+        }));
+      } else {
+        setFormFields(defaultFormFields);
+      }
+    }
+  }, [date, log]);
 
   return (
     <>
@@ -165,7 +195,11 @@ const Log = () => {
               id="morning-weight"
               placeholder="180.2"
               type="number"
-              value={formFields.morningWeight ?? ""}
+              value={
+                formFields.morningWeight
+                  ? formFields.morningWeight.toFixed(1)
+                  : ""
+              }
               onChange={(e) => validateWeight(e, "morning")}
             />
           </fieldset>
@@ -212,7 +246,9 @@ const Log = () => {
               id="night-weight"
               placeholder="180.2" // load in dynamically based on previous day
               type="number"
-              value={formFields.nightWeight ?? ""}
+              value={
+                formFields.nightWeight ? formFields.nightWeight.toFixed(1) : ""
+              }
               onChange={(e) => validateWeight(e, "night")}
             />
           </fieldset>
