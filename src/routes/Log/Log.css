@@ -109,7 +109,7 @@ textarea {
 }
 
 .Textarea {
-  height: 150px;
+  height: 100px;
   padding: 10px;
 }
 
@@ -135,6 +135,17 @@ textarea {
   box-shadow: 0 0 0 2px var(--green-7);
 }
 
+.Button.red {
+  background-color: var(--red-4);
+  color: var(--red-11);
+}
+.Button.red:hover {
+  background-color: var(--red-5);
+}
+.Button.red:focus {
+  box-shadow: 0 0 0 2px var(--red-7);
+}
+
 .TabsRoot .DateSelector {
   box-shadow: 0 0 0 1px var(--iris-7);
   border-radius: 5px;
@@ -145,4 +156,10 @@ textarea {
 
 .DatePicker {
   margin-left: 10px;
+}
+
+.LogForm {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }

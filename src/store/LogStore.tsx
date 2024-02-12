@@ -11,12 +11,19 @@ interface LogItem {
 interface LogState {
   log: LogItem[] | null;
   setLog: (logArr: LogItem[]) => void;
+  recentEntry: LogItem | null;
+  setRecentEntry: (entry: LogItem) => void;
 }
 
 const useStore = create<LogState>()((set) => ({
   log: null,
   setLog: (logArr: LogItem[]) => set({ log: logArr }),
+  recentEntry: null,
+  setRecentEntry: (entry: LogItem) => set({ recentEntry: entry }),
 }));
 
 export const useLog = () => useStore((state) => state.log);
 export const useSetLog = () => useStore((state) => state.setLog);
+export const useRecentEntry = () => useStore((state) => state.recentEntry);
+export const useSetRecentEntry = () =>
+  useStore((state) => state.setRecentEntry);

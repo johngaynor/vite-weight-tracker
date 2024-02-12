@@ -2,7 +2,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import DatePicker from "react-datepicker";
 import { useDarkMode, useUser } from "../../store/AppStore";
-import { useLog, useSetLog } from "../../store/LogStore";
+import {
+  useLog,
+  useSetLog,
+  useRecentEntry,
+  useSetRecentEntry,
+} from "../../store/LogStore";
 import { toast } from "react-toastify";
 import supabase from "../../config/SupabaseConfig";
 import "./Log.css";
@@ -31,6 +36,34 @@ const Log = () => {
   const user = useUser();
   const log = useLog();
   const setLog = useSetLog();
+  const recentEntry = useRecentEntry();
+  const setRecentEntry = useSetRecentEntry();
+
+  const getLog = async () => {
+    const { data, error } = await supabase
+      .from("user_log")
+      .select()
+      .eq("id", user.id);
+    if (error) {
+      toast.error("Error retrieving log: " + error.message);
+    } else {
+      toast.success("Succesfully retrieved logs!");
+      setLog(data);
+
+      if (data.length) {
+        const sortedData = [...data].sort((a: any, b: any) =>
+          b.day.localeCompare(a.day)
+        );
+        setRecentEntry(sortedData[0]);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      getLog();
+    }
+  }, [user]);
 
   const formatDate = () => {
     const day = date.getDate();
@@ -50,8 +83,12 @@ const Log = () => {
       e.preventDefault();
 
       const { morningWeight, morningNotes } = formFields;
-      if (!morningWeight) {
-        toast.error("Please enter a valid morning weight before saving.");
+      if ((morningWeight as number) > 700) {
+        toast.error(
+          "Morning weight of " +
+            morningWeight +
+            " is not physically possible..."
+        );
         return;
       }
 
@@ -76,8 +113,10 @@ const Log = () => {
       e.preventDefault();
 
       const { nightWeight, nightNotes } = formFields;
-      if (!nightWeight) {
-        toast.error("Please enter a valid night weight before saving.");
+      if ((nightWeight as number) > 700) {
+        toast.error(
+          "Night weight of " + nightWeight + " is not physically possible..."
+        );
         return;
       }
 
@@ -96,25 +135,6 @@ const Log = () => {
     },
     [formFields]
   );
-
-  const getLog = async () => {
-    const { data, error } = await supabase
-      .from("user_log")
-      .select()
-      .eq("id", user.id);
-    if (error) {
-      toast.error("Error retrieving log: " + error.message);
-    } else {
-      toast.success("Succesfully retrieved logs!");
-      setLog(data);
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      getLog();
-    }
-  }, [user]);
 
   useEffect(() => {
     if (log) {
@@ -135,11 +155,14 @@ const Log = () => {
   }, [date, log]);
 
   const handleBlur = (type: "morning" | "night") => {
-    const key = (type + "Weight") as keyof FormFields; // Assert that the key is a valid key
+    const key = (type + "Weight") as keyof FormFields;
     const val = formFields[key];
     setFormFields((prev) => ({
       ...prev,
-      [key]: val === null ? 0 : Math.abs(parseFloat(val as string)).toFixed(1),
+      [key]:
+        val === null || val === 0
+          ? null
+          : Math.abs(parseFloat(val as string)).toFixed(1),
     }));
   };
 
@@ -216,7 +239,11 @@ const Log = () => {
             <input
               className="Input"
               id="morning-weight"
-              placeholder="180.2"
+              placeholder={
+                recentEntry && recentEntry.morning_weight !== null
+                  ? String(recentEntry.morning_weight)
+                  : "..."
+              }
               type="number"
               value={formFields.morningWeight ?? ""}
               onChange={(e) => {
@@ -253,8 +280,23 @@ const Log = () => {
               justifyContent: "flex-end",
             }}
           >
-            <form onSubmit={handleSaveMorning}>
-              <button className="Button green">Save</button>
+            <form onSubmit={handleSaveMorning} className="LogForm">
+              <button
+                className="Button red"
+                type="button"
+                onClick={() =>
+                  setFormFields((prev) => ({
+                    ...prev,
+                    morningWeight: null,
+                    morningNotes: "",
+                  }))
+                }
+              >
+                X
+              </button>
+              <button className="Button green" type="submit">
+                Save
+              </button>
             </form>
           </div>
         </Tabs.Content>
@@ -270,7 +312,11 @@ const Log = () => {
             <input
               className="Input"
               id="night-weight"
-              placeholder="180.2" // load in dynamically based on previous day
+              placeholder={
+                recentEntry && recentEntry.night_weight !== null
+                  ? String(recentEntry.night_weight)
+                  : "..."
+              }
               type="number"
               value={formFields.nightWeight ?? ""}
               onChange={(e) => {
@@ -307,8 +353,23 @@ const Log = () => {
               justifyContent: "flex-end",
             }}
           >
-            <form onSubmit={handleSaveNight}>
-              <button className="Button green">Save</button>
+            <form onSubmit={handleSaveNight} className="LogForm">
+              <button
+                className="Button red"
+                type="button"
+                onClick={() =>
+                  setFormFields((prev) => ({
+                    ...prev,
+                    nightWeight: null,
+                    nightNotes: "",
+                  }))
+                }
+              >
+                X
+              </button>
+              <button className="Button green" type="submit">
+                Save
+              </button>
             </form>
           </div>
         </Tabs.Content>
