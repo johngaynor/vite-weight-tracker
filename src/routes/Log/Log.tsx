@@ -5,12 +5,11 @@ import { useDarkMode, useUser } from "../../store/AppStore";
 import { useLog, useSetLog } from "../../store/LogStore";
 import { toast } from "react-toastify";
 import supabase from "../../config/SupabaseConfig";
-import { useNavigate } from "react-router-dom";
 import "./Log.css";
 import "react-datepicker/dist/react-datepicker.css";
 
 type FormFields = {
-  morningWeight: number | null;
+  morningWeight: number | null | string;
   morningNotes: string;
   nightWeight: number | null;
   nightNotes: string;
@@ -29,59 +28,9 @@ const Log = () => {
   });
   const [date, setDate] = useState(new Date());
   const darkMode = useDarkMode();
-  const navigate = useNavigate();
   const user = useUser();
   const log = useLog();
   const setLog = useSetLog();
-
-  const handleSaveMorning = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      console.log(formFields);
-
-      navigate("/auth");
-    },
-    [formFields]
-  );
-
-  const handleSaveNight = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      console.log(formFields);
-    },
-    [formFields]
-  );
-
-  const validateWeight = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    b: "morning" | "night"
-  ) => {
-    const regex = /^\d*\.?\d{0,1}$/;
-    const newValue = e.target.value;
-
-    if (regex.test(newValue) || newValue === "" || newValue === "-") {
-      const type = b + "Weight";
-      setFormFields((prev) => ({
-        ...prev,
-        [type]: newValue === "" ? null : parseFloat(newValue),
-      }));
-    }
-  };
-
-  const getLog = async () => {
-    const { data, error } = await supabase
-      .from("user_log")
-      .select()
-      .eq("id", user.id);
-    if (error) {
-      toast.error("Error retrieving log: " + error.message);
-    } else {
-      toast.success("Succesfully retrieved logs!");
-      setLog(data);
-    }
-  };
 
   const formatDate = () => {
     const day = date.getDate();
@@ -94,6 +43,71 @@ const Log = () => {
       "-" +
       (day < 10 ? "0" + day : day);
     return formattedDate;
+  };
+
+  const handleSaveMorning = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      const { morningWeight, morningNotes } = formFields;
+      if (!morningWeight) {
+        toast.error("Please enter a valid morning weight before saving.");
+        return;
+      }
+
+      const { error } = await supabase.from("user_log").upsert({
+        id: user.id,
+        day: formatDate(),
+        morning_weight: morningWeight,
+        morning_notes: morningNotes,
+      });
+
+      if (error) {
+        toast.error("Error updating log: " + error.message);
+      } else {
+        toast.success("Successfully updated log!");
+      }
+    },
+    [formFields]
+  );
+
+  const handleSaveNight = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      const { nightWeight, nightNotes } = formFields;
+      if (!nightWeight) {
+        toast.error("Please enter a valid night weight before saving.");
+        return;
+      }
+
+      const { error } = await supabase.from("user_log").upsert({
+        id: user.id,
+        day: formatDate(),
+        night_weight: nightWeight,
+        night_notes: nightNotes,
+      });
+
+      if (error) {
+        toast.error("Error updating log: " + error.message);
+      } else {
+        toast.success("Successfully updated log!");
+      }
+    },
+    [formFields]
+  );
+
+  const getLog = async () => {
+    const { data, error } = await supabase
+      .from("user_log")
+      .select()
+      .eq("id", user.id);
+    if (error) {
+      toast.error("Error retrieving log: " + error.message);
+    } else {
+      toast.success("Succesfully retrieved logs!");
+      setLog(data);
+    }
   };
 
   useEffect(() => {
@@ -119,6 +133,15 @@ const Log = () => {
       }
     }
   }, [date, log]);
+
+  const handleBlur = (type: "morning" | "night") => {
+    const key = (type + "Weight") as keyof FormFields; // Assert that the key is a valid key
+    const val = formFields[key];
+    setFormFields((prev) => ({
+      ...prev,
+      [key]: val === null ? 0 : Math.abs(parseFloat(val as string)).toFixed(1),
+    }));
+  };
 
   return (
     <>
@@ -195,12 +218,15 @@ const Log = () => {
               id="morning-weight"
               placeholder="180.2"
               type="number"
-              value={
-                formFields.morningWeight
-                  ? formFields.morningWeight.toFixed(1)
-                  : ""
-              }
-              onChange={(e) => validateWeight(e, "morning")}
+              value={formFields.morningWeight ?? ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                setFormFields((prev) => ({
+                  ...prev,
+                  morningWeight: val === "" ? null : parseFloat(e.target.value),
+                }));
+              }}
+              onBlur={() => handleBlur("morning")}
             />
           </fieldset>
           <fieldset className="Fieldset">
@@ -246,10 +272,15 @@ const Log = () => {
               id="night-weight"
               placeholder="180.2" // load in dynamically based on previous day
               type="number"
-              value={
-                formFields.nightWeight ? formFields.nightWeight.toFixed(1) : ""
-              }
-              onChange={(e) => validateWeight(e, "night")}
+              value={formFields.nightWeight ?? ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                setFormFields((prev) => ({
+                  ...prev,
+                  nightWeight: val === "" ? null : parseFloat(e.target.value),
+                }));
+              }}
+              onBlur={() => handleBlur("night")}
             />
           </fieldset>
           <fieldset className="Fieldset">
