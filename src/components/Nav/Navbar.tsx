@@ -54,7 +54,7 @@ const Navbar = () => {
     } else {
       toast.success("You have successfully logged out. See you later :)");
       setUser(null);
-      navigate("/");
+      navigate("/auth");
     }
   };
 
@@ -112,6 +112,7 @@ const Navbar = () => {
             <Link
               className="NavigationMenuLink"
               to="https://github.com/johngaynor/vite-weight-tracker"
+              target="_blank"
             >
               Github
             </Link>

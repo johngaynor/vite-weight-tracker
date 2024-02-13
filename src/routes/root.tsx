@@ -100,7 +100,7 @@ const Root = () => {
             direction="column"
             align="center"
             justify="center"
-            style={{ height: "97vh" }}
+            style={{ height: "90vh" }}
           >
             {!initialLoad || logLoading ? <Spinner /> : <Outlet />}
           </Flex>
