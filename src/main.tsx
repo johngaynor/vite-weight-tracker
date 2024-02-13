@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-// import Home from "./routes/Home/Home.tsx";
 import Root from "./routes/root.tsx";
 import Auth from "./routes/Auth/Auth.tsx";
 import Log from "./routes/Log/Log.tsx";
@@ -22,10 +21,6 @@ const router = createBrowserRouter([
       },
       {
         path: "",
-        element: <Log />,
-      },
-      {
-        path: "log",
         element: <Log />,
       },
     ],

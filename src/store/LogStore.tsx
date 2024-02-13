@@ -10,14 +10,14 @@ interface LogItem {
 
 interface LogState {
   log: LogItem[] | null;
-  setLog: (logArr: LogItem[]) => void;
+  setLog: (logArr: LogItem[] | null) => void;
   recentEntry: LogItem | null;
   setRecentEntry: (entry: LogItem) => void;
 }
 
 const useStore = create<LogState>()((set) => ({
   log: null,
-  setLog: (logArr: LogItem[]) => set({ log: logArr }),
+  setLog: (logArr: LogItem[] | null) => set({ log: logArr }),
   recentEntry: null,
   setRecentEntry: (entry: LogItem) => set({ recentEntry: entry }),
 }));

@@ -2,12 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import DatePicker from "react-datepicker";
 import { useDarkMode, useUser } from "../../store/AppStore";
-import {
-  useLog,
-  useSetLog,
-  useRecentEntry,
-  useSetRecentEntry,
-} from "../../store/LogStore";
+import { useLog, useRecentEntry } from "../../store/LogStore";
 import { toast } from "react-toastify";
 import supabase from "../../config/SupabaseConfig";
 import "./Log.css";
@@ -35,35 +30,7 @@ const Log = () => {
   const darkMode = useDarkMode();
   const user = useUser();
   const log = useLog();
-  const setLog = useSetLog();
   const recentEntry = useRecentEntry();
-  const setRecentEntry = useSetRecentEntry();
-
-  const getLog = async () => {
-    const { data, error } = await supabase
-      .from("user_log")
-      .select()
-      .eq("id", user.id);
-    if (error) {
-      toast.error("Error retrieving log: " + error.message);
-    } else {
-      toast.success("Succesfully retrieved logs!");
-      setLog(data);
-
-      if (data.length) {
-        const sortedData = [...data].sort((a: any, b: any) =>
-          b.day.localeCompare(a.day)
-        );
-        setRecentEntry(sortedData[0]);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      getLog();
-    }
-  }, [user]);
 
   const formatDate = () => {
     const day = date.getDate();
