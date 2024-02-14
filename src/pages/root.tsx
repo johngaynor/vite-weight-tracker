@@ -13,7 +13,7 @@ import {
   useSetLogLoading,
   useSaveLogLoading,
 } from "../store/LoadingStore";
-import { getLog } from "./actions";
+import { getLog } from "./Log/actions";
 
 const Root = () => {
   const [initialLoad, setInitialLoad] = useState<boolean>(false);

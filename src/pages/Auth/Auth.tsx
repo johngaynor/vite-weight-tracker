@@ -1,20 +1,12 @@
 import React, { useCallback, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
-import { toast } from "react-toastify";
-import supabase from "../../config/SupabaseConfig";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css";
-
-type FormFields = {
-  loginEmail: string;
-  loginPassword: string;
-  registerEmail: string;
-  registerPassword: string;
-  registerConfirmPassword: string;
-};
+import { AuthFormFields } from "../types";
+import { login, register } from "./actions";
 
 const Auth = () => {
-  const [formFields, setFormFields] = useState<FormFields>({
+  const [formFields, setFormFields] = useState<AuthFormFields>({
     loginEmail: "",
     loginPassword: "",
     registerEmail: "",
@@ -26,27 +18,7 @@ const Auth = () => {
   const handleLogin = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email: formFields.loginEmail,
-        password: formFields.loginPassword,
-      });
-
-      if (error) {
-        toast.error("Error logging in: " + error.message);
-        setFormFields((prev) => ({
-          ...prev,
-          loginPassword: "",
-        }));
-      } else {
-        toast.success("Successfully logged in!");
-        setFormFields((prev) => ({
-          ...prev,
-          loginEmail: "",
-          loginPassword: "",
-        }));
-        navigate("/");
-      }
+      await login(formFields, setFormFields, navigate);
     },
     [formFields]
   );
@@ -54,38 +26,7 @@ const Auth = () => {
   const handleRegister = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (formFields.registerPassword !== formFields.registerConfirmPassword) {
-        toast.error(
-          "Please make sure passwords match before creating an account."
-        );
-        return;
-      }
-
-      const { error } = await supabase.auth.signUp({
-        email: formFields.registerEmail,
-        password: formFields.registerPassword,
-        options: {
-          emailRedirectTo: "localhost:5173",
-        },
-      });
-
-      if (error) {
-        toast.error("Error creating account: " + error.message);
-        setFormFields((prev) => ({
-          ...prev,
-          registerPassword: "",
-          registerConfirmPassword: "",
-        }));
-      } else {
-        toast.success("Successfully created an account!");
-        setFormFields((prev) => ({
-          ...prev,
-          registerEmail: "",
-          registerPassword: "",
-          registerConfirmPassword: "",
-        }));
-        navigate("/");
-      }
+      await register(formFields, setFormFields, navigate);
     },
     [formFields]
   );

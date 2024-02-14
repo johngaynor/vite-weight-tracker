@@ -5,9 +5,9 @@ import { useDarkMode, useUser } from "../../store/AppStore";
 import { useLog, useRecentEntry } from "../../store/LogStore";
 import "./Log.css";
 import "react-datepicker/dist/react-datepicker.css";
-import { FormFields } from "../types";
+import { LogFormFields } from "../types";
 import { formatDate } from "../../components/HelperFunctions/HelperFunctions";
-import { saveLog } from "../actions";
+import { saveLog } from "./actions";
 import { useSetSaveLogLoading } from "../../store/LoadingStore";
 
 const defaultFormFields = {
@@ -18,7 +18,7 @@ const defaultFormFields = {
 };
 
 const Log = () => {
-  const [formFields, setFormFields] = useState<FormFields>({
+  const [formFields, setFormFields] = useState<LogFormFields>({
     ...defaultFormFields,
   });
   const [date, setDate] = useState(new Date());
@@ -57,7 +57,7 @@ const Log = () => {
 
   // validating inputs after user loses focus
   const handleBlur = (type: "morning" | "night") => {
-    const key = (type + "Weight") as keyof FormFields;
+    const key = (type + "Weight") as keyof LogFormFields;
     const val = formFields[key];
     setFormFields((prev) => ({
       ...prev,

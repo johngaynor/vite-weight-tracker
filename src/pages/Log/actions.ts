@@ -1,10 +1,10 @@
 import { toast } from "react-toastify";
-import { FormFields } from "./types";
-import { formatDate } from "../components/HelperFunctions/HelperFunctions";
-import supabase from "../config/SupabaseConfig";
+import { LogFormFields } from "../types";
+import { formatDate } from "../../components/HelperFunctions/HelperFunctions";
+import supabase from "../../config/SupabaseConfig";
 
 export const saveLog = async (
-  formFields: FormFields,
+  formFields: LogFormFields,
   user: any,
   date: Date,
   setSaveLogLoading: Function
