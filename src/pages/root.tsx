@@ -12,6 +12,8 @@ import {
   useLogLoading,
   useSetLogLoading,
   useSaveLogLoading,
+  useLoginLoading,
+  useRegisterLoading,
 } from "../store/LoadingStore";
 import { getLog } from "./Log/actions";
 
@@ -26,6 +28,8 @@ const Root = () => {
   const logLoading = useLogLoading();
   const setLogLoading = useSetLogLoading();
   const saveLogLoading = useSaveLogLoading();
+  const loginLoading = useLoginLoading();
+  const registerLoading = useRegisterLoading();
 
   const { data } = supabase.auth.onAuthStateChange((event, session) => {
     // console.log("ROOT", event, session);
@@ -88,7 +92,11 @@ const Root = () => {
             justify="center"
             style={{ height: "90vh" }}
           >
-            {!initialLoad || logLoading || saveLogLoading ? (
+            {!initialLoad ||
+            logLoading ||
+            saveLogLoading ||
+            registerLoading ||
+            loginLoading ? (
               <Spinner />
             ) : (
               <Outlet />

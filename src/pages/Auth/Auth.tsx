@@ -4,6 +4,10 @@ import { useNavigate } from "react-router-dom";
 import "./Auth.css";
 import { AuthFormFields } from "../types";
 import { login, register } from "./actions";
+import {
+  useSetLoginLoading,
+  useSetRegisterLoading,
+} from "../../store/LoadingStore";
 
 const Auth = () => {
   const [formFields, setFormFields] = useState<AuthFormFields>({
@@ -14,11 +18,13 @@ const Auth = () => {
     registerConfirmPassword: "",
   });
   const navigate = useNavigate();
+  const setLoginLoading = useSetLoginLoading();
+  const setRegisterLoading = useSetRegisterLoading();
 
   const handleLogin = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      await login(formFields, setFormFields, navigate);
+      await login(formFields, setFormFields, navigate, setLoginLoading);
     },
     [formFields]
   );
@@ -26,7 +32,7 @@ const Auth = () => {
   const handleRegister = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      await register(formFields, setFormFields, navigate);
+      await register(formFields, setFormFields, navigate, setRegisterLoading);
     },
     [formFields]
   );

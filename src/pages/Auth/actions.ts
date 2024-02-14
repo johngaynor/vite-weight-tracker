@@ -5,8 +5,10 @@ import { toast } from "react-toastify";
 export const login = async (
   formFields: AuthFormFields,
   setFormFields: Function,
-  navigate: Function
+  navigate: Function,
+  setLoginLoading: Function
 ) => {
+  setLoginLoading(true);
   const { error } = await supabase.auth.signInWithPassword({
     email: formFields.loginEmail,
     password: formFields.loginPassword,
@@ -29,18 +31,21 @@ export const login = async (
     });
     navigate("/");
   }
+  setLoginLoading(false);
 };
 
 export const register = async (
   formFields: AuthFormFields,
   setFormFields: Function,
-  navigate: Function
+  navigate: Function,
+  setRegisterLoading: Function
 ) => {
   if (formFields.registerPassword !== formFields.registerConfirmPassword) {
     toast.error("Please make sure passwords match before creating an account.");
     return;
   }
 
+  setRegisterLoading(true);
   const { error } = await supabase.auth.signUp({
     email: formFields.registerEmail,
     password: formFields.registerPassword,
@@ -66,4 +71,5 @@ export const register = async (
     }));
     navigate("/");
   }
+  setRegisterLoading(false);
 };
