@@ -92,7 +92,9 @@ const Root = () => {
             direction="column"
             align="center"
             justify="center"
-            style={{ height: "90vh" }}
+            style={{
+              height: "97vh",
+            }}
           >
             {!initialLoad ||
             logLoading ||

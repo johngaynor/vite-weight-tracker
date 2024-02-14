@@ -11,7 +11,8 @@ p {
 }
 
 .NavigationMenuRoot {
-  /* position: absolute; */
+  position: absolute;
+  right: 0;
   display: flex;
   justify-content: center;
   width: 100%;
