@@ -7,7 +7,8 @@ export const saveLog = async (
   formFields: LogFormFields,
   user: any,
   date: Date,
-  setSaveLogLoading: Function
+  setSaveLogLoading: Function,
+  setRefreshLog: Function
 ) => {
   setSaveLogLoading(true);
   try {
@@ -33,6 +34,7 @@ export const saveLog = async (
     if (error) {
       throw new Error(error.message);
     }
+    setRefreshLog(true);
     toast.success("Successfully updated log!");
   } catch (error: any) {
     toast.error("Error: " + error.message);
@@ -44,14 +46,16 @@ export const getLog = async (
   session: any,
   setLog: Function,
   setLogLoading: Function,
-  setRecentEntry: Function
+  setRecentEntry: Function,
+  user: any
 ) => {
   setLogLoading(true);
   try {
+    const userId = session ? session.user.id : user.id;
     const { data, error } = await supabase
       .from("user_log")
       .select()
-      .eq("id", session.user.id);
+      .eq("id", userId);
     if (error) {
       throw new Error(error.message);
     }

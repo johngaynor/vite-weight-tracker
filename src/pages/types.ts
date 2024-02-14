@@ -12,3 +12,10 @@ export type AuthFormFields = {
   registerPassword: string;
   registerConfirmPassword: string;
 };
+
+export type LogFormChanges = {
+  morningWeight: boolean;
+  morningNotes: boolean;
+  nightWeight: boolean;
+  nightNotes: boolean;
+};

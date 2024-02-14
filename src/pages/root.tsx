@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Theme } from "@radix-ui/themes";
 import { Flex, Container } from "@radix-ui/themes";
 import Navbar from "../components/Nav/Navbar";
 import { useDarkMode, useUser, useSetUser } from "../store/AppStore";
-import { useLog, useSetLog, useSetRecentEntry } from "../store/LogStore";
+import {
+  useLog,
+  useSetLog,
+  useSetRecentEntry,
+  useRefreshLog,
+  useSetRefreshLog,
+} from "../store/LogStore";
 import { Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import supabase from "../config/SupabaseConfig";
@@ -26,6 +32,8 @@ const Root = () => {
   const log = useLog();
   const setLog = useSetLog();
   const setRecentEntry = useSetRecentEntry();
+  const refreshLog = useRefreshLog();
+  const setRefreshLog = useSetRefreshLog();
   const logLoading = useLogLoading();
   const setLogLoading = useSetLogLoading();
   const saveLogLoading = useSaveLogLoading();
@@ -43,7 +51,7 @@ const Root = () => {
       // handle sign in event (fires a lot, i.e. when switching tabs)
       if (session?.user && (!user || user.id !== session.user.id)) {
         setUser(session.user);
-        if (!log) getLog(session, setLog, setLogLoading, setRecentEntry);
+        if (!log) getLog(session, setLog, setLogLoading, setRecentEntry, null);
       }
     } else if (event === "SIGNED_OUT") {
       // handle sign out event
@@ -64,6 +72,13 @@ const Root = () => {
   } else {
     document.body.classList.remove("dark");
   }
+
+  useEffect(() => {
+    if (refreshLog) {
+      getLog(null, setLog, setLogLoading, setRecentEntry, user);
+      setRefreshLog(false);
+    }
+  }, [refreshLog]);
 
   return (
     <>

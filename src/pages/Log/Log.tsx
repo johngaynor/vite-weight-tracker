@@ -2,7 +2,15 @@ import React, { useCallback, useEffect, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import DatePicker from "react-datepicker";
 import { useDarkMode, useUser } from "../../store/AppStore";
-import { useLog, useRecentEntry } from "../../store/LogStore";
+import {
+  useLog,
+  useRecentEntry,
+  useUnsavedChanges,
+  useSetUnsavedChanges,
+  useSetRefreshLog,
+  useSelectedDate,
+  useSetSelectedDate,
+} from "../../store/LogStore";
 import "./Log.css";
 import "react-datepicker/dist/react-datepicker.css";
 import { LogFormFields } from "../types";
@@ -21,26 +29,33 @@ const Log = () => {
   const [formFields, setFormFields] = useState<LogFormFields>({
     ...defaultFormFields,
   });
-  const [date, setDate] = useState(new Date());
   const darkMode = useDarkMode();
   const user = useUser();
   const log = useLog();
   const recentEntry = useRecentEntry();
   const setSaveLogLoading = useSetSaveLogLoading();
+  const unsavedChanges = useUnsavedChanges();
+  const setUnsavedChanges = useSetUnsavedChanges();
+  const setRefreshLog = useSetRefreshLog();
+  const selectedDate = useSelectedDate();
+  const setSelectedDate = useSetSelectedDate();
+
+  const [date, setDate] = useState(selectedDate ?? new Date());
+  const formattedDate = formatDate(date);
+  const match = log?.find((l) => l.day === formattedDate);
 
   const handleSaveLog = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      await saveLog(formFields, user, date, setSaveLogLoading);
+      await saveLog(formFields, user, date, setSaveLogLoading, setRefreshLog);
     },
     [formFields, date]
   );
 
   // useEffect to find match and log
   useEffect(() => {
+    setUnsavedChanges(null);
     if (log) {
-      const formattedDate = formatDate(date);
-      const match = log.find((l) => l.day === formattedDate);
       if (match) {
         setFormFields((prev) => ({
           ...prev,
@@ -53,10 +68,39 @@ const Log = () => {
         setFormFields(defaultFormFields);
       }
     }
+
+    // updating selectedDate in state
+    if (date !== selectedDate) {
+      setSelectedDate(date);
+    }
   }, [date, log]);
 
   // validating inputs after user loses focus
   const handleBlur = (type: "morning" | "night") => {
+    const changes = {
+      morningWeight:
+        match?.morning_weight !== formFields.morningWeight ? true : false,
+      morningNotes:
+        match?.morning_notes !== formFields.morningNotes ? true : false,
+      nightWeight:
+        match?.night_weight !== formFields.nightWeight ? true : false,
+      nightNotes: match?.night_notes !== formFields.nightNotes ? true : false,
+    };
+
+    // console.log(match, formFields, changes);
+
+    let updateSavedChanges = false;
+    for (const key in changes) {
+      if (changes[key as keyof typeof changes]) {
+        updateSavedChanges = true;
+        break;
+      }
+    }
+
+    if (updateSavedChanges) {
+      setUnsavedChanges(changes);
+    } else setUnsavedChanges(null);
+
     const key = (type + "Weight") as keyof LogFormFields;
     const val = formFields[key];
     setFormFields((prev) => ({
@@ -136,7 +180,8 @@ const Log = () => {
           </p>
           <fieldset className="Fieldset">
             <label className="Label" htmlFor="morning-weight">
-              Morning Weight
+              Morning Weight{" "}
+              {unsavedChanges?.morningWeight ? "(unsaved changes)" : null}
             </label>
             <input
               className="Input"
@@ -160,7 +205,7 @@ const Log = () => {
           </fieldset>
           <fieldset className="Fieldset">
             <label className="Label" htmlFor="morning-notes">
-              Notes
+              Notes {unsavedChanges?.morningNotes ? "(unsaved changes)" : null}
             </label>
             <textarea
               className="Textarea"
@@ -173,6 +218,7 @@ const Log = () => {
                   morningNotes: e.target.value,
                 }))
               }
+              onBlur={() => handleBlur("morning")}
             />
           </fieldset>
           <div
@@ -209,7 +255,8 @@ const Log = () => {
           </p>
           <fieldset className="Fieldset">
             <label className="Label" htmlFor="night-weight">
-              Night Weight
+              Night Weight{" "}
+              {unsavedChanges?.nightWeight ? "(unsaved changes)" : null}
             </label>
             <input
               className="Input"
@@ -233,7 +280,7 @@ const Log = () => {
           </fieldset>
           <fieldset className="Fieldset">
             <label className="Label" htmlFor="night-notes">
-              Notes
+              Notes {unsavedChanges?.nightNotes ? "(unsaved changes)" : null}
             </label>
             <textarea
               className="Textarea"
@@ -246,6 +293,7 @@ const Log = () => {
                   nightNotes: e.target.value,
                 }))
               }
+              onBlur={() => handleBlur("night")}
             />
           </fieldset>
           <div
