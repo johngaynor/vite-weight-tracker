@@ -9,18 +9,19 @@ export const login = async (
   setLoginLoading: Function
 ) => {
   setLoginLoading(true);
-  const { error } = await supabase.auth.signInWithPassword({
-    email: formFields.loginEmail,
-    password: formFields.loginPassword,
-  });
+  try {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: formFields.loginEmail,
+      password: formFields.loginPassword,
+    });
 
-  if (error) {
-    toast.error("Error logging in: " + error.message);
-    setFormFields((prev: any) => ({
-      ...prev,
-      loginPassword: "",
-    }));
-  } else {
+    if (error) {
+      setFormFields((prev: any) => ({
+        ...prev,
+        loginPassword: "",
+      }));
+      throw new Error(error.message);
+    }
     toast.success("Successfully logged in!");
     setFormFields({
       loginEmail: "",
@@ -30,6 +31,8 @@ export const login = async (
       registerConfirmPassword: "",
     });
     navigate("/");
+  } catch (error: any) {
+    toast.error("Error: " + error.message);
   }
   setLoginLoading(false);
 };
@@ -40,28 +43,31 @@ export const register = async (
   navigate: Function,
   setRegisterLoading: Function
 ) => {
-  if (formFields.registerPassword !== formFields.registerConfirmPassword) {
-    toast.error("Please make sure passwords match before creating an account.");
-    return;
-  }
-
   setRegisterLoading(true);
-  const { error } = await supabase.auth.signUp({
-    email: formFields.registerEmail,
-    password: formFields.registerPassword,
-    options: {
-      emailRedirectTo: "localhost:5173",
-    },
-  });
+  try {
+    if (formFields.registerPassword !== formFields.registerConfirmPassword) {
+      throw new Error(
+        "Please make sure passwords match before creating an account."
+      );
+    }
 
-  if (error) {
-    toast.error("Error creating account: " + error.message);
-    setFormFields((prev: any) => ({
-      ...prev,
-      registerPassword: "",
-      registerConfirmPassword: "",
-    }));
-  } else {
+    const { error } = await supabase.auth.signUp({
+      email: formFields.registerEmail,
+      password: formFields.registerPassword,
+      options: {
+        emailRedirectTo: "localhost:5173",
+      },
+    });
+
+    if (error) {
+      setFormFields((prev: any) => ({
+        ...prev,
+        registerPassword: "",
+        registerConfirmPassword: "",
+      }));
+      throw new Error(error.message);
+    }
+
     toast.success("Successfully created an account!");
     setFormFields((prev: any) => ({
       ...prev,
@@ -70,6 +76,8 @@ export const register = async (
       registerConfirmPassword: "",
     }));
     navigate("/");
+  } catch (error: any) {
+    toast.error("Error: " + error.message);
   }
   setRegisterLoading(false);
 };
@@ -80,13 +88,16 @@ export const logout = async (
   setLogoutLoading: Function
 ) => {
   setLogoutLoading(true);
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    toast.error("Error signing out: " + error.message);
-  } else {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      throw new Error(error.message);
+    }
     toast.success("You have successfully logged out. See you later :)");
     setUser(null);
     navigate("/auth");
+  } catch (error: any) {
+    toast.error("Error: " + error.message);
   }
   setLogoutLoading(false);
 };

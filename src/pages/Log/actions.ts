@@ -9,31 +9,34 @@ export const saveLog = async (
   date: Date,
   setSaveLogLoading: Function
 ) => {
-  const { morningWeight, morningNotes, nightWeight, nightNotes } = formFields;
-
-  if ((morningWeight as number) > 700 || (nightWeight as number) > 700) {
-    toast.error("The weight you entered is not physically possible...");
-    return;
-  }
-
   setSaveLogLoading(true);
-  // I want to have something here to indicate that it was in an edit mode, and now it's saved.... something to show that the value is changed and needs to be saved?
+  try {
+    const { morningWeight, morningNotes, nightWeight, nightNotes } = formFields;
 
-  const { error } = await supabase.from("user_log").upsert({
-    id: user.id,
-    day: formatDate(date),
-    morning_weight: morningWeight,
-    morning_notes: morningNotes,
-    night_weight: nightWeight,
-    night_notes: nightNotes,
-  });
+    if ((morningWeight as number) > 700 || (nightWeight as number) > 700) {
+      throw new Error("The weight you entered is not physically possible...");
+    }
 
-  if (error) {
-    toast.error("Error updating log: " + error.message);
-  } else {
+    if (!user) throw new Error("Please sign in before saving your log.");
+
+    // I want to have something here to indicate that it was in an edit mode, and now it's saved.... something to show that the value is changed and needs to be saved?
+
+    const { error } = await supabase.from("user_log").upsert({
+      id: user.id,
+      day: formatDate(date),
+      morning_weight: morningWeight,
+      morning_notes: morningNotes,
+      night_weight: nightWeight,
+      night_notes: nightNotes,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
     toast.success("Successfully updated log!");
+  } catch (error: any) {
+    toast.error("Error: " + error.message);
   }
-
   setSaveLogLoading(false);
 };
 
@@ -44,13 +47,14 @@ export const getLog = async (
   setRecentEntry: Function
 ) => {
   setLogLoading(true);
-  const { data, error } = await supabase
-    .from("user_log")
-    .select()
-    .eq("id", session.user.id);
-  if (error) {
-    toast.error("Error retrieving log: " + error.message);
-  } else {
+  try {
+    const { data, error } = await supabase
+      .from("user_log")
+      .select()
+      .eq("id", session.user.id);
+    if (error) {
+      throw new Error(error.message);
+    }
     setLog(data);
     if (data.length) {
       const sortedData = [...data].sort((a: any, b: any) =>
@@ -58,6 +62,9 @@ export const getLog = async (
       );
       setRecentEntry(sortedData[0]);
     }
+  } catch (error: any) {
+    toast.error("Error: " + error.message);
   }
+
   setLogLoading(false);
 };
