@@ -4,16 +4,15 @@ import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 import { SunIcon, MoonIcon, HomeIcon } from "@radix-ui/react-icons";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import classNames from "classnames";
-import supabase from "../../config/SupabaseConfig";
-
+import { logout } from "../../pages/Auth/actions";
 import {
   useDarkMode,
   useChangeMode,
   useUser,
   useSetUser,
 } from "../../store/AppStore";
+import { useSetLogoutLoading } from "../../store/LoadingStore";
 import "./Navbar.css";
-import { toast } from "react-toastify";
 
 interface ListItemProps {
   className?: string;
@@ -28,6 +27,7 @@ const Navbar = () => {
   const user = useUser();
   const setUser = useSetUser();
   const navigate = useNavigate();
+  const setLogoutLoading = useSetLogoutLoading();
   const ListItem = forwardRef(
     (
       { className, children, title, to }: ListItemProps,
@@ -48,14 +48,7 @@ const Navbar = () => {
   );
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast.error("Error signing out: " + error.message);
-    } else {
-      toast.success("You have successfully logged out. See you later :)");
-      setUser(null);
-      navigate("/auth");
-    }
+    await logout(setUser, navigate, setLogoutLoading);
   };
 
   return (

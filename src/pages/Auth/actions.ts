@@ -73,3 +73,20 @@ export const register = async (
   }
   setRegisterLoading(false);
 };
+
+export const logout = async (
+  setUser: Function,
+  navigate: Function,
+  setLogoutLoading: Function
+) => {
+  setLogoutLoading(true);
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    toast.error("Error signing out: " + error.message);
+  } else {
+    toast.success("You have successfully logged out. See you later :)");
+    setUser(null);
+    navigate("/auth");
+  }
+  setLogoutLoading(false);
+};
