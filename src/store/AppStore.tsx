@@ -1,11 +1,5 @@
 import { create } from "zustand";
 
-// interface User {
-//   email: string;
-//   id: string;
-//   role: string;
-// }
-
 interface AppState {
   darkMode: boolean;
   changeMode: () => void;

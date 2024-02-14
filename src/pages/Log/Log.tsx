@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FormFields } from "../types";
 import { formatDate } from "../../components/HelperFunctions/HelperFunctions";
 import { saveLog } from "../actions";
+import { useSetSaveLogLoading } from "../../store/LoadingStore";
 
 const defaultFormFields = {
   morningWeight: null,
@@ -25,11 +26,12 @@ const Log = () => {
   const user = useUser();
   const log = useLog();
   const recentEntry = useRecentEntry();
+  const setSaveLogLoading = useSetSaveLogLoading();
 
   const handleSaveLog = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      await saveLog(formFields, user, date);
+      await saveLog(formFields, user, date, setSaveLogLoading);
     },
     [formFields, date]
   );
@@ -53,6 +55,7 @@ const Log = () => {
     }
   }, [date, log]);
 
+  // validating inputs after user loses focus
   const handleBlur = (type: "morning" | "night") => {
     const key = (type + "Weight") as keyof FormFields;
     const val = formFields[key];

@@ -6,7 +6,8 @@ import supabase from "../config/SupabaseConfig";
 export const saveLog = async (
   formFields: FormFields,
   user: any,
-  date: Date
+  date: Date,
+  setSaveLogLoading: Function
 ) => {
   const { morningWeight, morningNotes, nightWeight, nightNotes } = formFields;
 
@@ -14,6 +15,9 @@ export const saveLog = async (
     toast.error("The weight you entered is not physically possible...");
     return;
   }
+
+  setSaveLogLoading(true);
+  // I want to have something here to indicate that it was in an edit mode, and now it's saved.... something to show that the value is changed and needs to be saved?
 
   const { error } = await supabase.from("user_log").upsert({
     id: user.id,
@@ -29,4 +33,31 @@ export const saveLog = async (
   } else {
     toast.success("Successfully updated log!");
   }
+
+  setSaveLogLoading(false);
+};
+
+export const getLog = async (
+  session: any,
+  setLog: Function,
+  setLogLoading: Function,
+  setRecentEntry: Function
+) => {
+  setLogLoading(true);
+  const { data, error } = await supabase
+    .from("user_log")
+    .select()
+    .eq("id", session.user.id);
+  if (error) {
+    toast.error("Error retrieving log: " + error.message);
+  } else {
+    setLog(data);
+    if (data.length) {
+      const sortedData = [...data].sort((a: any, b: any) =>
+        b.day.localeCompare(a.day)
+      );
+      setRecentEntry(sortedData[0]);
+    }
+  }
+  setLogLoading(false);
 };

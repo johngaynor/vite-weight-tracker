@@ -5,19 +5,27 @@ import Navbar from "../components/Nav/Navbar";
 import { useDarkMode, useUser, useSetUser } from "../store/AppStore";
 import { useLog, useSetLog, useSetRecentEntry } from "../store/LogStore";
 import { Outlet } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import supabase from "../config/SupabaseConfig";
 import Spinner from "../components/Spinner/Spinner";
+import {
+  useLogLoading,
+  useSetLogLoading,
+  useSaveLogLoading,
+} from "../store/LoadingStore";
+import { getLog } from "./actions";
 
 const Root = () => {
   const [initialLoad, setInitialLoad] = useState<boolean>(false);
-  const [logLoading, setLogLoading] = useState<boolean>(false);
   const darkMode = useDarkMode();
   const user = useUser();
   const setUser = useSetUser();
   const log = useLog();
   const setLog = useSetLog();
   const setRecentEntry = useSetRecentEntry();
+  const logLoading = useLogLoading();
+  const setLogLoading = useSetLogLoading();
+  const saveLogLoading = useSaveLogLoading();
 
   const { data } = supabase.auth.onAuthStateChange((event, session) => {
     // console.log("ROOT", event, session);
@@ -29,29 +37,7 @@ const Root = () => {
       // handle sign in event (fires a lot, i.e. when switching tabs)
       if (session?.user && (!user || user.id !== session.user.id)) {
         setUser(session.user);
-        // get log
-        const getLog = async () => {
-          setLogLoading(true);
-          const { data, error } = await supabase
-            .from("user_log")
-            .select()
-            .eq("id", session.user.id);
-          if (error) {
-            toast.error("Error retrieving log: " + error.message);
-          } else {
-            setLog(data);
-
-            if (data.length) {
-              const sortedData = [...data].sort((a: any, b: any) =>
-                b.day.localeCompare(a.day)
-              );
-              setRecentEntry(sortedData[0]);
-            }
-          }
-          setLogLoading(false);
-        };
-
-        if (!log) getLog();
+        if (!log) getLog(session, setLog, setLogLoading, setRecentEntry);
       }
     } else if (event === "SIGNED_OUT") {
       // handle sign out event
@@ -102,7 +88,11 @@ const Root = () => {
             justify="center"
             style={{ height: "90vh" }}
           >
-            {!initialLoad || logLoading ? <Spinner /> : <Outlet />}
+            {!initialLoad || logLoading || saveLogLoading ? (
+              <Spinner />
+            ) : (
+              <Outlet />
+            )}
           </Flex>
         </Container>
       </Theme>
