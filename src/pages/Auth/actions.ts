@@ -16,10 +16,6 @@ export const login = async (
     });
 
     if (error) {
-      setFormFields((prev: any) => ({
-        ...prev,
-        loginPassword: "",
-      }));
       throw new Error(error.message);
     }
     toast.success("Successfully logged in!");
@@ -46,12 +42,14 @@ export const register = async (
   setRegisterLoading(true);
   try {
     if (formFields.registerPassword !== formFields.registerConfirmPassword) {
-      throw new Error(
-        "Please make sure passwords match before creating an account."
-      );
+      throw new Error("Passwords do not match.");
     }
 
-    const { error } = await supabase.auth.signUp({
+    if (formFields.registerPassword.length < 6) {
+      throw new Error("Password needs to be at least 6 characters long.");
+    }
+
+    const { error, data } = await supabase.auth.signUp({
       email: formFields.registerEmail,
       password: formFields.registerPassword,
       options: {
@@ -60,12 +58,11 @@ export const register = async (
     });
 
     if (error) {
-      setFormFields((prev: any) => ({
-        ...prev,
-        registerPassword: "",
-        registerConfirmPassword: "",
-      }));
       throw new Error(error.message);
+    }
+
+    if (!data.user?.identities?.length) {
+      throw new Error("This email address is already in use.");
     }
 
     toast.success("Successfully created an account!");
@@ -78,6 +75,11 @@ export const register = async (
     navigate("/");
   } catch (error: any) {
     toast.error("Error: " + error.message);
+    setFormFields((prev: any) => ({
+      ...prev,
+      registerPassword: "",
+      registerConfirmPassword: "",
+    }));
   }
   setRegisterLoading(false);
 };
