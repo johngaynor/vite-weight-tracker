@@ -1,6 +1,6 @@
 import "./Alert.css";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
-import Auth from "../../routes/Auth/Auth";
+import Auth from "../../pages/Auth/Auth";
 
 const AlertDialogDemo = () => (
   <AlertDialog.Root>

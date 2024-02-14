@@ -3,17 +3,11 @@ import * as Tabs from "@radix-ui/react-tabs";
 import DatePicker from "react-datepicker";
 import { useDarkMode, useUser } from "../../store/AppStore";
 import { useLog, useRecentEntry } from "../../store/LogStore";
-import { toast } from "react-toastify";
-import supabase from "../../config/SupabaseConfig";
 import "./Log.css";
 import "react-datepicker/dist/react-datepicker.css";
-
-type FormFields = {
-  morningWeight: number | null | string;
-  morningNotes: string;
-  nightWeight: number | null;
-  nightNotes: string;
-};
+import { FormFields } from "../types";
+import { formatDate } from "../../components/HelperFunctions/HelperFunctions";
+import { saveLog } from "../actions";
 
 const defaultFormFields = {
   morningWeight: null,
@@ -32,80 +26,18 @@ const Log = () => {
   const log = useLog();
   const recentEntry = useRecentEntry();
 
-  const formatDate = () => {
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const formattedDate =
-      year +
-      "-" +
-      (month < 10 ? "0" + month : month) +
-      "-" +
-      (day < 10 ? "0" + day : day);
-    return formattedDate;
-  };
-
-  const handleSaveMorning = useCallback(
+  const handleSaveLog = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-
-      const { morningWeight, morningNotes } = formFields;
-      if ((morningWeight as number) > 700) {
-        toast.error(
-          "Morning weight of " +
-            morningWeight +
-            " is not physically possible..."
-        );
-        return;
-      }
-
-      const { error } = await supabase.from("user_log").upsert({
-        id: user.id,
-        day: formatDate(),
-        morning_weight: morningWeight,
-        morning_notes: morningNotes,
-      });
-
-      if (error) {
-        toast.error("Error updating log: " + error.message);
-      } else {
-        toast.success("Successfully updated log!");
-      }
+      await saveLog(formFields, user, date);
     },
-    [formFields]
+    [formFields, date]
   );
 
-  const handleSaveNight = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      const { nightWeight, nightNotes } = formFields;
-      if ((nightWeight as number) > 700) {
-        toast.error(
-          "Night weight of " + nightWeight + " is not physically possible..."
-        );
-        return;
-      }
-
-      const { error } = await supabase.from("user_log").upsert({
-        id: user.id,
-        day: formatDate(),
-        night_weight: nightWeight,
-        night_notes: nightNotes,
-      });
-
-      if (error) {
-        toast.error("Error updating log: " + error.message);
-      } else {
-        toast.success("Successfully updated log!");
-      }
-    },
-    [formFields]
-  );
-
+  // useEffect to find match and log
   useEffect(() => {
     if (log) {
-      const formattedDate = formatDate();
+      const formattedDate = formatDate(date);
       const match = log.find((l) => l.day === formattedDate);
       if (match) {
         setFormFields((prev) => ({
@@ -247,7 +179,7 @@ const Log = () => {
               justifyContent: "flex-end",
             }}
           >
-            <form onSubmit={handleSaveMorning} className="LogForm">
+            <form onSubmit={handleSaveLog} className="LogForm">
               <button
                 className="Button red"
                 type="button"
@@ -320,7 +252,7 @@ const Log = () => {
               justifyContent: "flex-end",
             }}
           >
-            <form onSubmit={handleSaveNight} className="LogForm">
+            <form onSubmit={handleSaveLog} className="LogForm">
               <button
                 className="Button red"
                 type="button"
