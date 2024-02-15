@@ -1,7 +1,7 @@
 export type LogFormFields = {
   morningWeight: number | null | string;
   morningNotes: string;
-  nightWeight: number | null;
+  nightWeight: number | null | string;
   nightNotes: string;
 };
 

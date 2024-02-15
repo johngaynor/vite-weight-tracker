@@ -45,8 +45,8 @@ const Log = () => {
   const match = log?.find((l) => l.day === formattedDate);
 
   const handleSaveLog = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+    async (e: React.FormEvent<HTMLFormElement> | null) => {
+      if (e) e.preventDefault();
       await saveLog(formFields, user, date, setSaveLogLoading, setRefreshLog);
     },
     [formFields, date]
@@ -57,13 +57,16 @@ const Log = () => {
     setUnsavedChanges(null);
     if (log) {
       if (match) {
-        setFormFields((prev) => ({
-          ...prev,
-          morningWeight: match.morning_weight,
-          nightWeight: match.night_weight,
+        setFormFields({
+          morningWeight: match.morning_weight
+            ? match.morning_weight.toFixed(1)
+            : null,
+          nightWeight: match.night_weight
+            ? match.night_weight.toFixed(1)
+            : null,
           morningNotes: match.morning_notes || "",
           nightNotes: match.night_notes || "",
-        }));
+        });
       } else {
         setFormFields(defaultFormFields);
       }
@@ -79,12 +82,11 @@ const Log = () => {
   const handleBlur = (type: "morning" | "night") => {
     const changes = {
       morningWeight:
-        match?.morning_weight !== formFields.morningWeight ? true : false,
+        match?.morning_weight != formFields.morningWeight ? true : false,
       morningNotes:
-        match?.morning_notes !== formFields.morningNotes ? true : false,
-      nightWeight:
-        match?.night_weight !== formFields.nightWeight ? true : false,
-      nightNotes: match?.night_notes !== formFields.nightNotes ? true : false,
+        match?.morning_notes != formFields.morningNotes ? true : false,
+      nightWeight: match?.night_weight != formFields.nightWeight ? true : false,
+      nightNotes: match?.night_notes != formFields.nightNotes ? true : false,
     };
 
     // console.log(match, formFields, changes);
@@ -112,6 +114,23 @@ const Log = () => {
     }));
   };
 
+  const handleDateChange = async (newDate: Date | null) => {
+    if (unsavedChanges) {
+      const confirm = window.confirm(
+        "You have unsaved changes... would you like to save before continuing?"
+      );
+
+      if (confirm) {
+        await handleSaveLog(null);
+        console.log("confirmed save");
+      }
+    }
+
+    setDate(newDate ?? new Date());
+    setSelectedDate(newDate ?? new Date());
+    setUnsavedChanges(null);
+  };
+
   return (
     <>
       <Tabs.Root className="TabsRoot" defaultValue="tab1">
@@ -120,7 +139,7 @@ const Log = () => {
             showIcon
             toggleCalendarOnIconClick
             selected={date}
-            onChange={(d) => setDate(d ?? new Date())}
+            onChange={(d) => handleDateChange(d ?? null)}
             className="DatePicker"
             customInput={
               <input
@@ -180,8 +199,7 @@ const Log = () => {
           </p>
           <fieldset className="Fieldset">
             <label className="Label" htmlFor="morning-weight">
-              Morning Weight{" "}
-              {unsavedChanges?.morningWeight ? "(unsaved changes)" : null}
+              Morning Weight
             </label>
             <input
               className="Input"
@@ -205,7 +223,7 @@ const Log = () => {
           </fieldset>
           <fieldset className="Fieldset">
             <label className="Label" htmlFor="morning-notes">
-              Notes {unsavedChanges?.morningNotes ? "(unsaved changes)" : null}
+              Notes
             </label>
             <textarea
               className="Textarea"
@@ -242,7 +260,11 @@ const Log = () => {
               >
                 X
               </button>
-              <button className="Button green" type="submit">
+
+              <button
+                className={`Button green ${unsavedChanges ? "active" : null}`}
+                type="submit"
+              >
                 Save
               </button>
             </form>
@@ -255,8 +277,7 @@ const Log = () => {
           </p>
           <fieldset className="Fieldset">
             <label className="Label" htmlFor="night-weight">
-              Night Weight{" "}
-              {unsavedChanges?.nightWeight ? "(unsaved changes)" : null}
+              Night Weight
             </label>
             <input
               className="Input"
@@ -280,7 +301,7 @@ const Log = () => {
           </fieldset>
           <fieldset className="Fieldset">
             <label className="Label" htmlFor="night-notes">
-              Notes {unsavedChanges?.nightNotes ? "(unsaved changes)" : null}
+              Notes
             </label>
             <textarea
               className="Textarea"
@@ -317,7 +338,10 @@ const Log = () => {
               >
                 X
               </button>
-              <button className="Button green" type="submit">
+              <button
+                className={`Button green ${unsavedChanges ? "active" : null}`}
+                type="submit"
+              >
                 Save
               </button>
             </form>

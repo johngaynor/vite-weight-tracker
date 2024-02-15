@@ -132,7 +132,14 @@ textarea {
   background-color: var(--green-5);
 }
 .Button.green:focus {
-  box-shadow: 0 0 0 2px var(--green-7);
+  box-shadow: 0 0 0 4px var(--green-7);
+}
+
+.Button.green.active {
+  box-sizing: border-box;
+  border: none;
+  padding: 10px 12px;
+  animation: pulseAnimation 1s infinite;
 }
 
 .Button.red {
@@ -162,4 +169,22 @@ textarea {
   width: 100%;
   display: flex;
   justify-content: space-between;
+}
+
+@keyframes pulseAnimation {
+  0% {
+    border: 3px solid;
+    border-color: var(--green-7);
+    box-shadow: 0 0 5px rgba(0, 128, 0, 1);
+  }
+  50% {
+    border: 3px solid;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  100% {
+    border: 3px solid;
+    border-color: var(--green-7);
+    box-shadow: 0 0 5px rgba(0, 128, 0, 1);
+  }
 }

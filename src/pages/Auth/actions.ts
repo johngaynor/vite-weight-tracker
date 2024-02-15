@@ -65,7 +65,9 @@ export const register = async (
       throw new Error("This email address is already in use.");
     }
 
-    toast.success("Successfully created an account!");
+    toast.success(
+      "Successfully created an account! Please check your email to verify and login."
+    );
     setFormFields((prev: any) => ({
       ...prev,
       registerEmail: "",
