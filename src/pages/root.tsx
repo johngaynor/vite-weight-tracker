@@ -80,8 +80,6 @@ const Root = () => {
     }
   }, [refreshLog]);
 
-  console.log(process.env.TEST_KEY);
-
   return (
     <>
       <Theme
